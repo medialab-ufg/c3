@@ -10,7 +10,7 @@
 
 
 //#define DEBUG
-#define CuboID 1     // Os IDs dos cubos sao 0, 1 (UNO) e 2. Apenas configure o primeiro deles nesta linha!
+#define CuboID 0     // Os IDs dos cubos sao 0, 1 (UNO) e 2. Apenas configure o primeiro deles nesta linha!
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -46,6 +46,13 @@ RH_ASK driver(speed, rxPin, txPin, pttPin, pttInverse);
 //      Axis         Face 01         Face 02         Face 03         Face 04         Face 05         Face 06
 
 int16_t 
+
+#if CuboID==0// Cubo 0
+         v_AcX[6][2]={{-4136, 3072},{-14496,-1112 },{  8520, 16384},{9760,15672},{-13196,-7500},{-1516,5536}},
+         v_AcY[6][2]={{-5232,  948},{-29384,-11432},{-19952, -9500},{3684,10960},{  5020,11392},{-5888, 590}},
+         v_AcZ[6][2]={{15808,21676},{ -2788,  8704},{   200,  7200},{-516, 6140},{ -5280, 4192},{-22520,  0}};
+#endif
+
 
 #if CuboID==1// Cubo 1
          v_AcX[6][2]={{-5776, 3708},{-13904, -7684},{-17396,  -472},{ 10844, 15276},{ 10300,13932},{ -1796,  5648}},
