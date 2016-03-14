@@ -9,8 +9,15 @@
 // Data: 20/out/2015
 
 
-//#define DEBUG
-#define CuboID 0     // Os IDs dos cubos sao 0, 1 (UNO) e 2. Apenas configure o primeiro deles nesta linha!
+#define DEBUG_RF_REC
+//#define DEBUG_RF_SND
+#define DEBUG_AC
+//#define DEBUG_SM
+//#define DEBUG_LED
+//#define DEBUG_BZ
+
+
+#define CuboID 0    // Os IDs dos cubos sao 0, 1 (UNO) e 2. Apenas configure o primeiro deles nesta linha!
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -61,7 +68,7 @@ boolean RF_on = 0; // Indica se o RF est on/off
 
 #define maxmatrizcores 18
 
-uint8_t matrizcores[18][3]={
+uint8_t matrizcores[maxmatrizcores][3]={
   {255,0,0}, // red
   {0,255,0}, // lime
   {0,0,255}, // blue
@@ -100,6 +107,7 @@ uint8_t matrizcores[18][3]={
 };
 */
 
+int palheta_pos = -1;
 uint32_t cores[4];  // Guarda as cores dos cubos
 uint32_t ultima_cor, cor_apagada;
 
@@ -136,7 +144,7 @@ volatile int max_contador_musica = 0;
 void setup(){
   Serial.begin(9600); // Debugging only
   c=0;
-  estado[CuboID]=0; /// XX mudar para =0
+  estado[CuboID]=30; /// XX mudar para =0
   setup_RF();
   //setup_timer();
   //InitBuzzer();
@@ -224,13 +232,15 @@ uint16_t InitBuzzer( void ) {
 void loop_RF()
 {
     if (RF_on == 0) return ;
+
     uint8_t buf[RH_ASK_MAX_MESSAGE_LEN];
     uint8_t buflen = sizeof(buf);
 
     //Serial.println("Teste de recepcao");
+    
     if (driver.recv(buf, &buflen)) // Non-blocking
     {
-       #ifdef DEBUG
+       #ifdef DEBUG_RF_REC
          Serial.println("Recebeu");
        #endif
        int cubo=((int)buf[0]);  // Obtem ID do cubo que enviou a mensagem
@@ -239,15 +249,15 @@ void loop_RF()
          unsigned long valor=((unsigned long)buf[2]<<24)+((unsigned long)buf[3]<<16)+((unsigned long)buf[4]<<8)+((unsigned long)buf[5]);
          cores[cubo]=((unsigned long)buf[6]<<24)+((unsigned long)buf[7]<<16)+((unsigned long)buf[8]<<8)+((unsigned long)buf[9]);
          estado[cubo]=buf[10];
-         //#ifdef DEBUG
+         #ifdef DEBUG_RF_REC
            Serial.print("\t\t\tCubo= "); Serial.println(cubo);
            Serial.print("\t\t\tFace= "); Serial.println(face[cubo]);
            Serial.print("\t\t\tC= "); Serial.println(valor);
            Serial.print("\t\t\tCor= "); Serial.println(cores[cubo]);
            Serial.println(c);
-         //#endif
+         #endif
          c=(c+valor)/2;
-         #ifdef DEBUG
+         #ifdef DEBUG_RF_REC
            Serial.println(c);
          #endif
          // Atualizar aqui a contagem da ultima vez que o cubo enviou mensagem
@@ -262,7 +272,7 @@ void loop_RF()
         c_notreceived=0;
       }*/
      if ((c/200)%3==CuboID) {
-       if (c_notreceived<10)
+       //if (c_notreceived<10)
        {  // XXXX melhorar aqui enviando mais vezes 0 <= c % inter <= 10
          char msg[12];        // Monta mensagem para enviar
          msg[0]= CuboID; // Comeca com o ID do cubo: A=0, B=1 ou C=2
@@ -282,7 +292,7 @@ void loop_RF()
            driver.waitPacketSent();
          //}
          c_notreceived++;
-         #ifdef DEBUG
+         #ifdef DEBUG_RF_SND
            Serial.print("Enviou  ");
            Serial.println(c);
          #endif
@@ -347,6 +357,34 @@ void configCorAleatoria(){
   preencheCor(cores[CuboID]);
 }
 
+
+// Configura uma cor da palheta para o cubo
+void definirCorPalheta(int pos){  // pos deve ser um numero entre 0 e 17 da palheta de cores
+  palheta_pos = pos;
+  cores[CuboID]=Color(matrizcores[palheta_pos][0], matrizcores[palheta_pos][1], matrizcores[palheta_pos][2]);
+
+  // Incluir aqui um código para chamar a linha abaixo apenas se a fita de LED já estiver acesar
+  preencheCor(cores[CuboID]);
+}
+
+
+// Configura a cor do cubo como sendo a próxima na palheta de cores
+void definirCorPalhetaProx(){  // pos deve ser um numero entre 0 e 17 da palheta de cores
+  palheta_pos = (palheta_pos+1) % maxmatrizcores;
+  cores[CuboID]=Color(matrizcores[palheta_pos][0], matrizcores[palheta_pos][1], matrizcores[palheta_pos][2]);
+ 
+  // Incluir aqui um código para chamar a linha abaixo apenas se a fita de LED já estiver acesar
+  preencheCor(cores[CuboID]);
+}
+
+void definirCorRGB(int R, int G, int B){  // pos deve ser um numero entre 0 e 17 da palheta de cores
+  cores[CuboID]=Color(R, G, B);
+
+  // Incluir aqui um código para chamar a linha abaixo apenas se a fita de LED já estiver acesar
+  preencheCor(cores[CuboID]);
+}
+
+
 // Desliga luzes
 void luzdesligada(){
   preencheCor(cor_apagada);
@@ -363,14 +401,36 @@ void luzligada(){
   preencheCor(cores[CuboID]);
 }
 
+
+// Vericar se a cor de uma cubo é igual a cor informada
+boolean corIgualA(int ID, uint32_t COR){
+   return cores[ID] == COR;
+}
+
+
+// Vericar se a cor de uma cubo é igual a cor informada
+boolean corIgualA(int ID, int R, int G, int B){
+   return cores[ID] == Color(R,G,B);
+}
+
+
+// Produz um som no arduino
+void somligado(int freq, int tempo){
+  if (tempo ==0) tone(pinSom, freq);
+  else {
+    tone(pinSom, freq, tempo);
+    noTone(pinSom); 
+  }
+}
+
 // Desliga som do arduino
 void somdesligado(){
   noTone(pinSom);
 }
 
 // Som intermitente lento
-void somintermitente(int tempo){
-  if (((millis()/tempo)%2)==1) tone(pinSom, bip);
+void somintermitente(int freq, int tempo){
+  if (((millis()/tempo)%2)==1) tone(pinSom, freq);
   else noTone(pinSom);
 }
 
@@ -429,14 +489,21 @@ void  loop_StateMachine() {
   presente_cubo_outro2=(tempoatual>c_CubosAtivosUltimaVez[CuboID_outro2])&&((tempoatual-c_CubosAtivosUltimaVez[CuboID_outro2])<(max_c_received));
   soma_cubos_presentes=presente_cubo_outro1+presente_cubo_outro2;
 
-  #ifdef DEBUG
+  #ifdef DEBUG_SM
     Serial.print("Estado = "); Serial.print(estado[CuboID]); Serial.print(" Face="); Serial.print(face[CuboID]); Serial.print("  Tempo="); Serial.println(tempoatual - tempoparado);
     Serial.print("                                                     Segurando = "); if (segurando) Serial.print("SIM"); else Serial.print("NAO"); 
     Serial.print(" Balancando = "); if (balancando) Serial.println("SIM"); else Serial.println("NAO"); 
   #endif
   // Controle da maquina de estados
   switch (estado[CuboID]) {
-   case 0: estado[CuboID]=30;
+#include "sm.h"
+  }
+}
+
+
+/*
+
+ case 0: estado[CuboID]=30;
            break;
            
            // Estado inicial, representando as configuracoes V**, >**, AXX, AXO e AOX
@@ -454,11 +521,11 @@ void  loop_StateMachine() {
              }
            }
 
-           /*if (soma_cubos_presentes==1) somintermitente(250); // Apenas um dos outros dois cubos esta perto causa som intermitente
-           else if ((soma_cubos_presentes==2) &&
-                ((face[CuboID]!=1)||(face[CuboID_outro1]!=1)||(face[CuboID_outro2]!=1))) somintermitente(1000); // Os outros dois cubos estao pertos mas com faces erradas causa som intermitente rapido
-           else somdesligado(); // Os dois outros cubos estao longe implica em som desligado
-           */
+           ///if (soma_cubos_presentes==1) somintermitente(500, 250); // Apenas um dos outros dois cubos esta perto causa som intermitente
+           //else if ((soma_cubos_presentes==2) &&
+           //     ((face[CuboID]!=1)||(face[CuboID_outro1]!=1)||(face[CuboID_outro2]!=1))) somintermitente(500, 1000); // Os outros dois cubos estao pertos mas com faces erradas causa som intermitente rapido
+           //else somdesligado(); // Os dois outros cubos estao longe implica em som desligado
+           
 
            if ((face[CuboID]==1)&&(soma_cubos_presentes==2)&&
                (face[CuboID_outro1]==1)&&(face[CuboID_outro2]==1)) { // Todos os cubos estao na configuracao correta, entao deve-se mudar para o estado 1
@@ -492,7 +559,7 @@ void  loop_StateMachine() {
    case 4: // Estado esperando por configuracao XXX
            somdesligado();
            luzpiscando(100);
-           if ((face[CuboID]==6)/*&&(soma_cubos_presentes==0)*/)
+           if ((face[CuboID]==6)//&&(soma_cubos_presentes==0)//)
               estado[CuboID]=0;
            break;
 
@@ -535,24 +602,27 @@ void  loop_StateMachine() {
    case 20:
        somdesligado();
        luzdesligada();
-       SetRFoff();
+       //SetRFoff();
        estado[CuboID] = 21;
        break;
    case 21:
-       if(balancando) estado[CuboID] = returned_State;  // 0
+       if(segurando) { 
+         //SetRFon();
+         estado[CuboID] = returned_State;  // 0
+       }
        break;
 
   // cubo muda de cor de acordo com a face
   case 30: 
-     tempomarcado = tempomarcado=millis(); // guarda tempo atual
+     tempomarcado=millis(); // guarda tempo atual
      estado[CuboID] = 31;
      break;
   case 31:     
      int cor=-1;
      switch (face[CuboID]) {
-       case 1: cor = 0; break;
+       case 1: cor = 2; break;
        case 2: cor = 1; break;
-       case 3: cor = 2; break;
+       case 3: cor = 0; break;
        case 4: cor = 3; break;
        case 5: cor = 8; break;
        case 6: cor = 15; break;
@@ -562,9 +632,10 @@ void  loop_StateMachine() {
        cores[CuboID]=Color(matrizcores[cor][0], matrizcores[cor][1], matrizcores[cor][2]);
        luzligada();
      }
-     else {luzdesligada(); /*beep(500);*/ }
+     else {luzdesligada(); beep(500); }
      if ((tempoatual < tempomarcado)|| segurando)  tempomarcado=millis();
      else if ((tempoatual - tempomarcado) > 15000) {returned_State=30; estado[CuboID] = 20;} 
      break;
   }
-}
+  
+*/
