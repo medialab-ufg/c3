@@ -144,7 +144,7 @@ volatile int max_contador_musica = 0;
 void setup(){
   Serial.begin(9600); // Debugging only
   c=0;
-  estado[CuboID]=30; /// XX mudar para =0
+  estado[CuboID]=0; /// XX mudar para =0
   setup_RF();
   //setup_timer();
   //InitBuzzer();
