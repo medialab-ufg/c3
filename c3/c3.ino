@@ -9,15 +9,14 @@
 // Data: 20/out/2015
 
 
-#define DEBUG_RF_REC
+//#define DEBUG_RF_REC
 //#define DEBUG_RF_SND
-#define DEBUG_AC
+//#define DEBUG_AC
 //#define DEBUG_SM
 //#define DEBUG_LED
 //#define DEBUG_BZ
 
-
-#define CuboID 0    // Os IDs dos cubos sao 0, 1 (UNO) e 2. Apenas configure o primeiro deles nesta linha!
+#include "sm_declare.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -72,19 +71,19 @@ uint8_t matrizcores[maxmatrizcores][3]={
   {255,0,0}, // red
   {0,255,0}, // lime
   {0,0,255}, // blue
-  {0,255,255},
+  {0,254,255}, // white blue
   {0,128,255},
   {0,128,128}, // teal
   {0,255,128},
   {128,255,0},
-  {255,255,0}, // yellow
+  {254,255,0}, // yellow
   {255,128,0},
   {128,128,0},  // olive
   {128,128,65},
   {128,65,128},
   {128,0,128},
   {128,0,255},
-  {255,0,255},
+  {254,0,255},
   {255,0,128},
   {128,128,128}  // cyan
 }; // navy
@@ -326,18 +325,19 @@ void preencheCor(uint32_t cor)
   int i;    //criando um contador.
 
  //Serial.println("AQUI1");
- // Serial.print("Cor="); Serial.println(cor);
+  Serial.print("Cor="); Serial.println(cor);
  if (cor==ultima_cor) return; else ultima_cor=cor;
 
  fitaLED.setPixelColor(0, cor);
  fitaLED.show();
  //Serial.println("AQUI2");
- /*
- for (i=0; i < fitaLED.numPixels(); i++)
+ 
+ /*for (i=0; i < fitaLED.numPixels(); i++)
   {
       fitaLED.setPixelColor(i, cor);
-      fitaLED.show();
-  }*/
+      
+  }
+  fitaLED.show(); */
 }
 
 void setDefaultColor() {
@@ -350,10 +350,10 @@ void setDefaultColor() {
 
 // Configura aleatoriamente uma cor para o cubo
 void configCorAleatoria(){
-  int i = random(0,maxmatrizcores);
-  //Serial.print("Cor escolhida: "); Serial.print(i); Serial.print(" ");
-  cores[CuboID]=Color(matrizcores[i][0], matrizcores[i][1], matrizcores[i][2]);
-  //Serial.println(cores[CuboID]);
+  palheta_pos = random(0,maxmatrizcores);
+  cores[CuboID]=Color(matrizcores[palheta_pos][0], matrizcores[palheta_pos][1], matrizcores[palheta_pos][2]);
+  
+   // Incluir aqui um código para chamar a linha abaixo apenas se a fita de LED já estiver acesar
   preencheCor(cores[CuboID]);
 }
 
@@ -419,6 +419,7 @@ void somligado(int freq, int tempo){
   if (tempo ==0) tone(pinSom, freq);
   else {
     tone(pinSom, freq, tempo);
+    delay(tempo);
     noTone(pinSom); 
   }
 }
