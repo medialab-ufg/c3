@@ -1,0 +1,66 @@
+Cubos
+0 - Arduino Uno
+1 - Arduino Uno
+2 - Arduino Duemilanove with ATmega328
+
+Arduino UNO
+===========
+Digital Pin:
+ 5 - pttPin (NÃO USADO)
+ 6 - RF grande - Receiver rx (Marrom Claro)
+ 7 - Fita LED - pinoDadosSDI, plug preto Esq interno (Branco) 
+
+ 8 - Fita LED - pinoRelogioCKI, plug preto Esq externo (Vermelho)
+ 9 - Buzzer (Marrom)
+ 10 - RF pequeno - Emmiter tx (Amarelo)
+
+ GND  - Buzzer (verde)
+
+Analogic Pin:
+ A5 - Acelerômetro SCL (marrom)
+ A4 - Acelerômetro SDA (azul)
+
+
+ACELERÔMETRO 
+=================
+VCC - (Op. de 3V a 5V - recomendável)
+GND -
+SCL - Arduino A5 (marrom)
+SDA - Arduino A4 (azul) 
+
+Obs: pino AD0 desconectado define que o endereço I2C do sensor é 0x68
+
+Dependências: I2Cdev,MPU-6050
+
+
+RF pequeno Transmiter (FS1000A/XY-FST RF 433Mhz)
+=================================================
+ATAD - Arduino pin Digital 10 (Amarelo)
+VCC - 3V  (Recomendado: 5V)
+GND -
+Dependências: RadioHead
+
+
+RF grande Receiver (XY-MK-5V  433Mhz RF)
+========================================
+VCC  - 5V (Recomendado: 3V)
+DATA - Arduino pin Digital 6 (Marrom Claro)
+DATA - vazio
+GND  - 
+Dependências: RadioHead
+
+
+Fita de LED  (visão sempre de frente à entrada do plug)
+===========
+Plug preto esquerdo externo (IN - CKI) - Arduino Pin Digital D3
+Plug preto esquerdo interno (IN - SDI) - Arduino Pin Digital D2
+Plug preto direto interno - Arduino 5V
+Plug preto direto externo - Arduino GND
+
+Conector verde Power externo -Positivo (vermelho)
+Conector verde Power interno - Negativo (preto)
+
+Conector verde Fita 1 (esq) - LED energia
+Conector verde Fita 2  - LED B
+Conector verde Fita 3  - LED G
+Conector verde Fita 4 (dir) - LED R 
