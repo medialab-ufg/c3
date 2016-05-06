@@ -65,46 +65,35 @@ unsigned long c_CubosAtivosUltimaVez[4]={999999999,999999999,999999999,999999999
 
 boolean RF_on = 0; // Indica se o RF est on/off
 
-#define maxmatrizcores 18
+#define maxmatrizcores 24
 
 uint8_t matrizcores[maxmatrizcores][3]={
-  {255,0,0}, // red
-  {0,255,0}, // lime
-  {0,0,255}, // blue
-  {0,254,255}, // white blue
-  {0,128,255},
-  {0,128,128}, // teal
-  {0,255,128},
-  {128,255,0},
-  {254,255,0}, // yellow
-  {255,128,0},
-  {128,128,0},  // olive
-  {128,128,65},
-  {128,65,128},
-  {128,0,128},
-  {128,0,255},
-  {254,0,255},
-  {255,0,128},
-  {128,128,128}  // cyan
-}; // navy
-/*
-  {135,206,235}, // lightblue
-  {255,0,255}, // magenta
-  {128,0,128}, // purple
-  {255,0,0}, // red
-  {128,128,0}, // maroon
-  {255,192,203}, // pink
-  {250,128,114}, // salmon
-  {255,165,0}, // orange
-  {255,215,0}, // gold
-  {255,255,0}, // yellow
-  {128,128,0}, // olive
-  {0,255,255}, // cyan
-  {0,128,128}, // teal
-  {0,255,0}, // lime
-  {0,128,0} // green
+  {255,0,0}, // 0 red
+  {0,255,0}, // 1 lime
+  {0,0,255}, // 2 blue
+  {0,128,0}, // 3 green
+  {0,254,255}, // 4 cyan
+  {0,128,255}, // 5 white blue darks
+  {0,128,128}, // 6 teal
+  {0,255,128}, // 7
+  {128,255,0}, // 8
+  {255,255,0}, // 9 yellow
+  {255,128,0}, // 10
+  {255,165,0}, // 11 orange
+  {255,215,0}, // 12 gold
+  {255,192,203}, // 13 pink
+  {250,128,114}, // 14 salmon
+  {128,128,0},  // 15 olive // maroon
+  {128,128,65}, // 16
+  {128,65,128}, // 17
+  {128,0,128}, // 18 purple
+  {128,0,255}, // 19
+  {254,0,255}, // 20 magenta
+  {255,0,128}, // 21
+  {128,128,128},  // 22 cyan
+  {135,206,235} // 23 lightblue
 };
-*/
+
 
 int palheta_pos = -1;
 uint32_t cores[4];  // Guarda as cores dos cubos
@@ -115,6 +104,13 @@ union {
  long lng;
 } both;
 
+
+
+/*
+ Definition for controling state changes
+*/
+
+
 unsigned long c=0;                          // Contador de iteracao e usado para sincronizar os arduinos
 //unsigned int cinter=300;                  // Intervalo de espera (em iteracoes) para enviar uma mensagem por RF. Pode ser mudado aleatoriamente
 unsigned int c_notreceived=0;               // Contagem de iteracoes desde a ultima vez que recebeu mensagem de um dos cubos.
@@ -123,11 +119,18 @@ const unsigned int max_c_received = 3000;    // Indica a quantidade de iteracoes
                                              // que um dos cubos esta ja fora de alcance
 
 int estado[4]={-1,-1,-1,-1};                 // Estado do cubo atual
-int returned_State=0;                        // Estado de retorno, em caso de um GoSub
+int return_State=0;                        // Estado de retorno, em caso de um GoSub
 int pinLED = 13;
 
 unsigned long tempomarcado;
 uint32_t tempoparado;
+
+#define SAVE_BATERY_STATE 10000 
+
+/*
+ Sound
+*/
+
 
 volatile int pinSom=9,                   // Pino para conexao ao dispositivo de som
     bip=500;               // Nota do bip
@@ -135,6 +138,8 @@ volatile int pinSom=9,                   // Pino para conexao ao dispositivo de 
 volatile int contador_musica = 0;
 volatile int finalizoumusica = 1;
 volatile int max_contador_musica = 0;
+
+
 
 /*
   Setup e Loop gerais
@@ -177,7 +182,7 @@ void setup_RF()
     pinMode(6,INPUT); // Ensure high impedance at D9
     //pinMode(9,INPUT); // Ensure high impedance at D9
     pinMode(10,INPUT); // Ensure high impedance at D10
-    SetRFon();
+    setRFon();
 }
 
 void setup_timer (){
@@ -270,7 +275,7 @@ void loop_RF()
         cinter=300+random(1,10); // XXXX possivelmente reduzir o valor maximo de cinter
         c_notreceived=0;
       }*/
-     if ((c/200)%3==CuboID) {
+     if ((millis()/200)%3==CuboID) {
        //if (c_notreceived<10)
        {  // XXXX melhorar aqui enviando mais vezes 0 <= c % inter <= 10
          char msg[12];        // Monta mensagem para enviar
@@ -287,8 +292,8 @@ void loop_RF()
          msg[10]=estado[CuboID];
          msg[11]=0;
          //for (int i=0; i<3; i++)  {
-           driver.send((uint8_t *)msg, 12);
-           driver.waitPacketSent();
+          driver.send((uint8_t *)msg, 12);
+          driver.waitPacketSent();
          //}
          c_notreceived++;
          #ifdef DEBUG_RF_SND
@@ -300,9 +305,9 @@ void loop_RF()
    }
 }
 
-void SetRFon() { RF_on=1; }
+void setRFon() { RF_on=1; }
 
-void SetRFoff() { RF_on=0; }
+void setRFoff() { RF_on=0; }
 
 
 /*
@@ -324,8 +329,6 @@ void preencheCor(uint32_t cor)
 {
   int i;    //criando um contador.
 
- //Serial.println("AQUI1");
-  Serial.print("Cor="); Serial.println(cor);
  if (cor==ultima_cor) return; else ultima_cor=cor;
 
  fitaLED.setPixelColor(0, cor);
@@ -359,7 +362,7 @@ void configCorAleatoria(){
 
 
 // Configura uma cor da palheta para o cubo
-void definirCorPalheta(int pos){  // pos deve ser um numero entre 0 e 17 da palheta de cores
+void definirCorPalheta(int pos){  // pos deve ser um numero entre 0 e maxmatrizcores-1 da palheta de cores
   palheta_pos = pos;
   cores[CuboID]=Color(matrizcores[palheta_pos][0], matrizcores[palheta_pos][1], matrizcores[palheta_pos][2]);
 
@@ -369,7 +372,7 @@ void definirCorPalheta(int pos){  // pos deve ser um numero entre 0 e 17 da palh
 
 
 // Configura a cor do cubo como sendo a próxima na palheta de cores
-void definirCorPalhetaProx(){  // pos deve ser um numero entre 0 e 17 da palheta de cores
+void definirCorPalhetaProx(){  // pos deve ser um numero entre 0 e maxmatrizcores-1 da palheta de cores
   palheta_pos = (palheta_pos+1) % maxmatrizcores;
   cores[CuboID]=Color(matrizcores[palheta_pos][0], matrizcores[palheta_pos][1], matrizcores[palheta_pos][2]);
  
@@ -377,7 +380,7 @@ void definirCorPalhetaProx(){  // pos deve ser um numero entre 0 e 17 da palheta
   preencheCor(cores[CuboID]);
 }
 
-void definirCorRGB(int R, int G, int B){  // pos deve ser um numero entre 0 e 17 da palheta de cores
+void definirCorRGB(int R, int G, int B){  // pos deve ser um numero entre 0 e maxmatrizcores-1 da palheta de cores
   cores[CuboID]=Color(R, G, B);
 
   // Incluir aqui um código para chamar a linha abaixo apenas se a fita de LED já estiver acesar
@@ -475,6 +478,19 @@ void tocamusica(int ID){
   }
 }
 
+/* subrotines for improving the state machine fucntionality */
+
+// Set return state
+void setReturnState(int state) {
+   return_State=state;
+}
+
+// Jump to a state for waiting holding
+void goToSaveBatteryState(int return_state) {
+  return_State=return_state;
+  estado[CuboID]=SAVE_BATERY_STATE;
+}
+
 
 /*
   Codigo da Maquina de estados
@@ -498,6 +514,18 @@ void  loop_StateMachine() {
   // Controle da maquina de estados
   switch (estado[CuboID]) {
 #include "sm.h"
+
+
+    // Code for saving batery
+    case SAVE_BATERY_STATE: setRFoff();
+                            luzdesligada();
+                            estado[CuboID]=SAVE_BATERY_STATE+1;
+                            break;
+    case SAVE_BATERY_STATE+1: if (segurando) estado[CuboID]=SAVE_BATERY_STATE+2;
+                              break;
+    case SAVE_BATERY_STATE+2: if (segurando) {setRFon(); estado[CuboID]=return_State;}
+                              break;
+                              
   }
 }
 

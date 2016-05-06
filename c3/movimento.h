@@ -21,9 +21,9 @@ int16_t
 #endif
 
 #if CuboID==2// Cubo 2
-         v_AcX[6][2]={{-2904, 3832},{-13460, -8844},{-13700,-7724},{  7040,14956},{ 8544,15164},{ -1796,  6112}},
-         v_AcY[6][2]={{-6952, 4792},{  8912, 13368},{-14912,-9064},{-14760,-7744},{ 7676,14440},{ -3476,  5024}},
-         v_AcZ[6][2]={{13236,20576},{ -3588,  2292},{ -3812, 3188},{ -3600, 5104},{-2000, 4184},{-22140,-14436}};
+         v_AcX[6][2]={{-2904, 3832},{-13460, -8844},{ -13700,-7724},{  7040,14956},{ 8544,15164},{ -1796,  6112}},
+         v_AcY[6][2]={{-6952, 4792},{  8912, 13368},{ -14912,-9064},{-14760,-7744},{ 7676,14440},{ -3476,  5024}},
+         v_AcZ[6][2]={{13236,20576},{ -3588,  2292},{  -3812, 3188},{ -3600, 5104},{-2000, 4184},{-22140,-14436}};
 #endif
 
 
@@ -99,7 +99,7 @@ void loop_Acl() {
           break;
      }
 
-   // verificar se o usuario est' balancando o cubo, movendo-o ou parado
+   // verificar se o usuario esta' balancando o cubo, movendo-o ou parado
   tmp_time_acel = millis();
 
      
@@ -113,8 +113,9 @@ void loop_Acl() {
     //double dist_old=dist[posdist]; 
     somadist -= dist[posdist];
     somadist += (dist[posdist] =  dist1);
-    #ifdef DEBUG
-      Serial.print("soma dist = "); Serial.print(somadist); 
+    #ifdef DEBUG_AC
+      Serial.print("face = "); Serial.print(face[CuboID]); 
+      Serial.print("\tsoma dist = "); Serial.print(somadist); 
       Serial.print("\t\tdist1 = "); Serial.print(dist1); 
       if (dist1<0)  Serial.print("ERROR   ");
       Serial.print("\t\tdist2 = "); Serial.println(dist2);
@@ -132,7 +133,7 @@ void loop_Acl() {
     } */
     bAcX=AcX; bAcY=AcY; bAcZ=AcZ; bGyX=GyX; bGyY=GyY; bGyZ=GyZ;
     if (somadist>90000) {
-      #ifdef DEBUG
+      #ifdef DEBUG_AC
          Serial.println(">>>>>>balancando");
       #endif
       balancando=true;
@@ -140,7 +141,7 @@ void loop_Acl() {
     } else {
       balancando=false;
       if (/*dist1 > 500  || */ dist2 > 30000) {
-        #ifdef DEBUG
+        #ifdef DEBUG_AC
            Serial.println("\t\t\t\t*************Segurando*****");
         #endif
         segurando=true;
