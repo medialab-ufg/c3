@@ -143,9 +143,10 @@ elements in file sm_declare.h
 
 
 
-  // Example 4: cubo muda de cor de acordo com a face    
+  // Example 4: cubo acende ao ser segurado e  muda de cor e faz beep quando sacudido    
   case 0:   
      luzdesligada();
+     somdesligado();
      tempomarcado=millis(); // guarda tempo atual
      estado[CuboID] = 1;
   case 1: 
@@ -176,5 +177,6 @@ elements in file sm_declare.h
       estado[CuboID] = 5; 
       break;
    case 5: //
+      if (balancando) estado[CuboID] = 2;
       if (!segurando) estado[CuboID] = 0;
       break;
