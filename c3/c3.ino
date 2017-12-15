@@ -13,9 +13,9 @@
 //#define DEBUG_RF_REC
 //#define DEBUG_RF_SND
 //#define DEBUG_AC
-//#define DEBUG_SM
-//#define DEBUG_LED
-//#define DEBUG_BZ
+#define DEBUG_SM
+#define DEBUG_LED
+#define DEBUG_BZ
 
 #include "sm_declare.h"
 
@@ -512,7 +512,7 @@ void  loop_StateMachine() {
   #endif
   // Controle da maquina de estados
   switch (estado[CuboID]) {
-#include "sm.h"
+#include "20171215-color-circle.h"
 
 
     // Code for saving batery
