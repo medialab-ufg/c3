@@ -338,12 +338,12 @@ void loop_RF()
          //c_notreceived=0;
        } else if (cubo==100) //< Control cubes has sent the message
             if ((int)buf[1] == CuboID) {//< Message is sent to the current cube...
-              int32_t projID=getFromBuffer_int32 (&buf[2]);
+              int32_t projID=getFromBuffer_int32 (&buf[2]); // Get project ID
               bool justloadedall=false;
-              if ((projectID[CuboID]!=projID) && (((int)buf[7])==1)) {
+              if ((projectID[CuboID]!=projID) && (((int)buf[7])==1) /* first block */) {
                   free_SM(&sm);
                   if (recbuffer) { free(recbuffer); recbuffer=NULL; }
-                  recbuffer =malloc((int)buf[6]*BUFFERSIZE);
+                  recbuffer =malloc((int)buf[6]*BUFFERSIZE); // buf[6] is the amount of blocks to be received
                   int lengthread=BUFFERSIZE;
                   if (lengthread>(buflen-8)) lengthread=buflen-8;
                   recbufferpos=0;
@@ -366,9 +366,9 @@ void loop_RF()
                   loadingflag=((int)buf[7]<(int)buf[6]);
                   justloadedall=!loadingflag;   
                }
-               if (justloadedall){
+               if (justloadedall){ // Have just read the last block. Process the complete buffer creating the data structures
 
-
+			
 
 
 
@@ -388,8 +388,22 @@ void loop_RF()
      if (loadingflag) {  // Sending a message to controler (ID=100) say what has been received up to now
          char msg[16];        // Monta mensagem para enviar
          msg[0]= (uint8_t)CuboID+10; // Comeca com o ID do cubo: A=0, B=1 ou C=2
-         msg[1]= (uint8_t)loadingcount; // Adiciona a face do cubo atual
-         msg[2]= 0; 
+         msg[1]= (uint8_t)((projectID[CuboID]&0xFF000000) >> 24); // Adiciona o ID do projeto
+         msg[2]= (uint8_t)((projectID[CuboID]&0x00FF0000) >> 16);
+         msg[3]= (uint8_t)((projectID[CuboID]&0x0000FF00) >> 8);
+         msg[4]= (uint8_t)(projectID[CuboID]&0x000000FF);
+         msg[5]= (uint8_t)loadingcount; // Adiciona o número do bloco recentemente lido
+         msg[6]= 0; 
+        //for (int i=0; i<3; i++)  {
+          driver.send((uint8_t *)msg, 16);
+          driver.waitPacketSent();
+         //}
+         c_notreceived++;
+         #ifdef DEBUG_RF_SND
+           Serial.print("Enviou  ");
+           Serial.println(c);
+         #endif
+         
      } else if ((millis()/200)%3==CuboID) {
        //if (c_notreceived<10)
        {  // XXXX melhorar aqui enviando mais vezes 0 <= c % inter <= 10
