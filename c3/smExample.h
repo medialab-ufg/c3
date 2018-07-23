@@ -12,6 +12,8 @@
 */
 
 /*
+ * 
+ * 
   switch(face[CuboID]){
     case 1: 
       definirCorPalheta(2);//Azul();
@@ -41,9 +43,9 @@
   break;
 */
 
+/*
 
-
-//Cores associadas a cada face do cubo
+//6 cores, 6 face, mesma cor para todos os cubos
 
 case 0:
 
@@ -92,8 +94,114 @@ case 6: //MAGENTA
   luzligada();
   estado[CuboID] = 0;
   break;
+*/
 
 
+/*
+ * 
+ * 12 Cores, 6 por cubo, cubos 1 e 2
+case 0:
+
+  switch(face[CuboID]){
+    case 1:
+      if(CuboID == 1) estado[CuboID] = 1; 
+      else if(CuboID == 2) estado[CuboID] = 7; 
+      break;
+    case 2:
+      if(CuboID == 1) estado[CuboID] = 2; 
+      else if(CuboID == 2) estado[CuboID] = 8; 
+      break;
+    case 3:
+      if(CuboID == 1) estado[CuboID] = 3; 
+      else if(CuboID == 2) estado[CuboID] = 9; 
+      break;
+    case 4:
+      if(CuboID == 1) estado[CuboID] = 4; 
+      else if(CuboID == 2) estado[CuboID] = 10; 
+      break;
+    case 5:
+      if(CuboID == 1) estado[CuboID] = 5; 
+      else if(CuboID == 2) estado[CuboID] = 11; 
+      break;
+    case 6:  
+      if(CuboID == 1) estado[CuboID] = 6;
+      else if(CuboID == 2) estado[CuboID] = 12; 
+      break;
+  }
+  break;
+
+//CUBO1...
+case 1: //AZUL
+  definirCorPalheta(2);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+  
+case 2: //AMARELO
+  definirCorPalheta(9);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+
+case 3: //VERMELHO
+  definirCorPalheta(0);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+
+case 4: //VERDE
+  definirCorPalheta(3);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+
+case 5: //LARANJA
+  definirCorPalheta(11);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+
+case 6: //MAGENTA
+  definirCorPalheta(20);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+//...fim CUBO1
+
+//CUBO2...
+case 7: //Purple
+  definirCorPalheta(18);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+case 8: //Cyan
+  definirCorPalheta(4);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+case 9: //teal
+  definirCorPalheta(6);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+case 10: //Pink
+  definirCorPalheta(13);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+case 11: //Lightblue
+  definirCorPalheta(23);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+case 12: //salmao
+  definirCorPalheta(14);
+  luzligada();
+  estado[CuboID] = 0;
+  break;
+//...fim CUBO2
+
+*/
 
 
 /*
@@ -103,9 +211,9 @@ case 6: //MAGENTA
  * 
  * Exemplo 2: Se o Cubo 1 tiver a cor Vermelho e o cubo 2 tiver a cor Verde (por exemplo), o Cubo 0 tera a cor Amarelo
  * 
- * 
+ * falta testar nos cubos
  */
- /*  em desenvolvimento
+
 case 0:
   //inicializa desligado
   luzdesligada();
@@ -116,53 +224,164 @@ case 0:
 case 1:
   //SaveBattery
   if (tempoatual < tempomarcado) tempomarcado=millis();
-  else if ((tempoatual - tempomarcado) > 15000)  {
+  else if ((tempoatual - tempomarcado) > 150000)  {
     somligado(500, 250);
     goToSaveBatteryState(0);
   }
   
-  if(CuboID == 1 || CuboID ==2){
+  if(CuboID == 0){
+    estado[CuboID] == 8;
+  }
+  
+  else if(CuboID == 1 || CuboID == 2){
     switch(face[CuboID]){
-      case 1: 
-        definirCorPalheta(2);//corAzul();
-        luzligada();
-        break;
-      case 2:
-        definirCorPalheta(9);//corAmarelo();
-        luzligada();
-        break;
-      case 3: 
-        definirCorPalheta(0);//corVermelho();
-        luzligada();
-        break;
-      case 4: 
-        definirCorPalheta(3);//corVerde();
-        luzligada();
-        break;
-      case 5: 
-        definirCorPalheta(11);//corLaranja();
-        luzligada();
-        break;
-      case 6: 
-        definirCorPalheta(20);//corMagenta();
-        luzligada();
-        break;
+      case 1: estado[CuboID] = 2; break;
+      case 2: estado[CuboID] = 3; break;
+      case 3: estado[CuboID] = 4; break;
+      case 4: estado[CuboID] = 5; break;
+      case 5: estado[CuboID] = 6; break;
+      case 6: estado[CuboID] = 7; break; 
     }
   }
-  if(CuboID == 0){
-    estado[CuboID] == 2;
-  }
+
   break;
 
-case 2:
+case 2: //AZUL
+  definirCorPalheta(2);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+  
+case 3: //AMARELO
+  definirCorPalheta(9);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
 
-  if(face[1] == face[2]){
-    if(face[1] == 1){
-      
-    }
+case 4: //VERMELHO
+  definirCorPalheta(0);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 5: //VERDE
+  definirCorPalheta(3);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 6: //LARANJA
+  definirCorPalheta(11);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 7: //MAGENTA
+  definirCorPalheta(20);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 8:
+
+  if(face[1] == face[2]){ //Cubos de mesma cor
+    if(face[1] == 1) estado[CuboID] = 2;
+    else if(face[1] == 2) estado[CuboID] = 3;
+    else if(face[1] == 3) estado[CuboID] = 4;
+    else if(face[1] == 4) estado[CuboID] = 5;
+    else if(face[1] == 5) estado[CuboID] = 6;
+    else if(face[1] == 6) estado[CuboID] = 7;
   }
+/*
+ * azul + amarelo = verde
+ * azul + vermelho = magenta
+ * azul + verde = ciano
+ * azul + laranja = amarelo-alaranjado (RGB: 237,118,14)
+ * azul + magenta = purple 18
+ * 
+ * amarelo + vermelho = laranja
+ * amarelo + verde = olive 15
+ * amarelo + laranja = vermelho
+ * amarelo + magenta = laranja
+ * 
+ * vermelho + verde = amarelo
+ * vermelho + laranja = vermelho-alaranjado (RGB: 255, 69, 0)
+ * vermelho + magenta = rosa 13
+ * 
+ * verde + laranja = citrino
+ * verde + magenta = ardosia
+ * 
+ * laranja + magenta = vermelho
+ * 
+ */
+  else if(face[1] == 1 && face[2] == 2 || face[2] == 1 && face[1] == 2) estado[CuboID] = 5; //azul + ararelo = verde
+  else if(face[1] == 1 && face[2] == 3 || face[2] == 1 && face[1] == 3) estado[CuboID] = 7; //azul + vermelho = magenta
+  else if(face[1] == 1 && face[2] == 4 || face[2] == 1 && face[1] == 4) estado[CuboID] = 9; //azul + verde = ciano
+  else if(face[1] == 1 && face[2] == 5 || face[2] == 1 && face[1] == 5) estado[CuboID] = 10; //azul + laranja = amarelo-alaranjado
+  else if(face[1] == 1 && face[2] == 6 || face[2] == 1 && face[1] == 6) estado[CuboID] = 11; //azul + magenta = purple
+
+  else if(face[1] == 2 && face[2] == 3 || face[2] == 2 && face[1] == 3) estado[CuboID] = 6; //amarelo + vermelho = laranja
+  else if(face[1] == 2 && face[2] == 4 || face[2] == 2 && face[1] == 4) estado[CuboID] = 12; //amarelo + verde = olive
+  else if(face[1] == 2 && face[2] == 5 || face[2] == 2 && face[1] == 5) estado[CuboID] = 4; //amarelo + laranja = vermelho
+  else if(face[1] == 2 && face[2] == 6 || face[2] == 2 && face[1] == 6) estado[CuboID] = 6; //amarelo + magenta = laranja
+
+  else if(face[1] == 3 && face[2] == 4 || face[2] == 3 && face[1] == 4) estado[CuboID] = 3;  //vermelho + verde = amarelo
+  else if(face[1] == 3 && face[2] == 5 || face[2] == 3 && face[1] == 5) estado[CuboID] = 13;  //vermelho + laranja = vermelho-alaranjado
+  else if(face[1] == 3 && face[2] == 6 || face[2] == 3 && face[1] == 6) estado[CuboID] = 14;  //vermelho + magenta = rosa
+
+  else if(face[1] == 4 && face[2] == 5 || face[2] == 4 && face[1] == 5) estado[CuboID] = 15;  //verde + laranja = citrino
+  else if(face[1] == 4 && face[2] == 6 || face[2] == 4 && face[1] == 6) estado[CuboID] = 16;  //verde + magenta = ardosia
+  
+  else if(face[1] == 5 && face[2] == 6 || face[2] == 5 && face[1] == 6) estado[CuboID] = 4; //laranja + magenta = considerei vermelho
 
 
-*/
+  
+  break;
 
+case 9://cyan
+  definirCorPalheta(4);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
 
+case 10://amarelo-alaranjado 237,118,14  
+  definirCorRGB(237,118,14);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 11://purple
+  definirCorPalheta(18);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 12://olive
+  definirCorPalheta(15);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+  
+case 13://vermelho-alaranjado
+  definirCorRGB(255,69,0);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+  
+case 14://rosa
+  definirCorPalheta(13);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 15://citrino
+  definirCorRGB(98,91,65);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
+
+case 16://ardosia
+  definirCorRGB(123,104,238);
+  luzligada();
+  estado[CuboID] = 1;
+  break;
