@@ -211,8 +211,8 @@ case 12: //salmao
  * 
  * Exemplo 2: Se o Cubo 1 tiver a cor Vermelho e o cubo 2 tiver a cor Verde (por exemplo), o Cubo 0 tera a cor Amarelo
  * 
- * falta testar nos cubos
  */
+
 
 case 0:
   //inicializa desligado
@@ -228,12 +228,15 @@ case 1:
     somligado(500, 250);
     goToSaveBatteryState(0);
   }
-  
+ 
   if(CuboID == 0){
-    estado[CuboID] == 8;
+    estado[CuboID] = 8;
   }
   
   else if(CuboID == 1 || CuboID == 2){
+    if(segurando) luzpiscando(200);
+    if(balancando) somligado(440.0, 500);
+    if(!balancando) somdesligado();
     switch(face[CuboID]){
       case 1: estado[CuboID] = 2; break;
       case 2: estado[CuboID] = 3; break;
@@ -283,15 +286,17 @@ case 7: //MAGENTA
   break;
 
 case 8:
-
-  if(face[1] == face[2]){ //Cubos de mesma cor
-    if(face[1] == 1) estado[CuboID] = 2;
-    else if(face[1] == 2) estado[CuboID] = 3;
-    else if(face[1] == 3) estado[CuboID] = 4;
-    else if(face[1] == 4) estado[CuboID] = 5;
-    else if(face[1] == 5) estado[CuboID] = 6;
-    else if(face[1] == 6) estado[CuboID] = 7;
+  //somligado(494.0, 500);
+  if(face[CuboID_outro1] == face[CuboID_outro2]){ //Cubos de mesma cor
+    if(face[CuboID_outro1] == 1) estado[CuboID] = 2;
+    else if(face[CuboID_outro1] == 2) estado[CuboID] = 3;
+    else if(face[CuboID_outro1] == 3) estado[CuboID] = 4;
+    else if(face[CuboID_outro1] == 4) estado[CuboID] = 5;
+    else if(face[CuboID_outro1] == 5) estado[CuboID] = 6;
+    else if(face[CuboID_outro1] == 6) estado[CuboID] = 7;
   }
+
+  */
 /*
  * azul + amarelo = verde
  * azul + vermelho = magenta
@@ -314,25 +319,25 @@ case 8:
  * laranja + magenta = vermelho
  * 
  */
-  else if(face[1] == 1 && face[2] == 2 || face[2] == 1 && face[1] == 2) estado[CuboID] = 5; //azul + ararelo = verde
-  else if(face[1] == 1 && face[2] == 3 || face[2] == 1 && face[1] == 3) estado[CuboID] = 7; //azul + vermelho = magenta
-  else if(face[1] == 1 && face[2] == 4 || face[2] == 1 && face[1] == 4) estado[CuboID] = 9; //azul + verde = ciano
-  else if(face[1] == 1 && face[2] == 5 || face[2] == 1 && face[1] == 5) estado[CuboID] = 10; //azul + laranja = amarelo-alaranjado
-  else if(face[1] == 1 && face[2] == 6 || face[2] == 1 && face[1] == 6) estado[CuboID] = 11; //azul + magenta = purple
+  else if(face[CuboID_outro1] == 1 && face[CuboID_outro2] == 2 || face[CuboID_outro2] == 1 && face[CuboID_outro1] == 2) estado[CuboID] = 5; //azul + ararelo = verde ((CuboID + 1) % 3) e ((CuboID + 2) % 3) ou CuboID_outro1 e CuboID_outro2
+  else if(face[CuboID_outro1] == 1 && face[CuboID_outro2] == 3 || face[CuboID_outro2] == 1 && face[CuboID_outro1] == 3) estado[CuboID] = 7; //azul + vermelho = magenta
+  else if(face[CuboID_outro1] == 1 && face[CuboID_outro2] == 4 || face[CuboID_outro2] == 1 && face[CuboID_outro1] == 4) estado[CuboID] = 9; //azul + verde = ciano
+  else if(face[CuboID_outro1] == 1 && face[CuboID_outro2] == 5 || face[CuboID_outro2] == 1 && face[CuboID_outro1] == 5) estado[CuboID] = 10; //azul + laranja = amarelo-alaranjado
+  else if(face[CuboID_outro1] == 1 && face[CuboID_outro2] == 6 || face[CuboID_outro2] == 1 && face[CuboID_outro1] == 6) estado[CuboID] = 11; //azul + magenta = purple
 
-  else if(face[1] == 2 && face[2] == 3 || face[2] == 2 && face[1] == 3) estado[CuboID] = 6; //amarelo + vermelho = laranja
-  else if(face[1] == 2 && face[2] == 4 || face[2] == 2 && face[1] == 4) estado[CuboID] = 12; //amarelo + verde = olive
-  else if(face[1] == 2 && face[2] == 5 || face[2] == 2 && face[1] == 5) estado[CuboID] = 4; //amarelo + laranja = vermelho
-  else if(face[1] == 2 && face[2] == 6 || face[2] == 2 && face[1] == 6) estado[CuboID] = 6; //amarelo + magenta = laranja
+  else if(face[CuboID_outro1] == 2 && face[CuboID_outro2] == 3 || face[CuboID_outro2] == 2 && face[CuboID_outro1] == 3) estado[CuboID] = 6; //amarelo + vermelho = laranja
+  else if(face[CuboID_outro1] == 2 && face[CuboID_outro2] == 4 || face[CuboID_outro2] == 2 && face[CuboID_outro1] == 4) estado[CuboID] = 12; //amarelo + verde = olive
+  else if(face[CuboID_outro1] == 2 && face[CuboID_outro2] == 5 || face[CuboID_outro2] == 2 && face[CuboID_outro1] == 5) estado[CuboID] = 4; //amarelo + laranja = vermelho
+  else if(face[CuboID_outro1] == 2 && face[CuboID_outro2] == 6 || face[CuboID_outro2] == 2 && face[CuboID_outro1] == 6) estado[CuboID] = 6; //amarelo + magenta = laranja
 
-  else if(face[1] == 3 && face[2] == 4 || face[2] == 3 && face[1] == 4) estado[CuboID] = 3;  //vermelho + verde = amarelo
-  else if(face[1] == 3 && face[2] == 5 || face[2] == 3 && face[1] == 5) estado[CuboID] = 13;  //vermelho + laranja = vermelho-alaranjado
-  else if(face[1] == 3 && face[2] == 6 || face[2] == 3 && face[1] == 6) estado[CuboID] = 14;  //vermelho + magenta = rosa
+  else if(face[CuboID_outro1] == 3 && face[CuboID_outro2] == 4 || face[CuboID_outro2] == 3 && face[CuboID_outro1] == 4) estado[CuboID] = 3;  //vermelho + verde = amarelo
+  else if(face[CuboID_outro1] == 3 && face[CuboID_outro2] == 5 || face[CuboID_outro2] == 3 && face[CuboID_outro1] == 5) estado[CuboID] = 13;  //vermelho + laranja = vermelho-alaranjado
+  else if(face[CuboID_outro1] == 3 && face[CuboID_outro2] == 6 || face[CuboID_outro2] == 3 && face[CuboID_outro1] == 6) estado[CuboID] = 14;  //vermelho + magenta = rosa
 
-  else if(face[1] == 4 && face[2] == 5 || face[2] == 4 && face[1] == 5) estado[CuboID] = 15;  //verde + laranja = citrino
-  else if(face[1] == 4 && face[2] == 6 || face[2] == 4 && face[1] == 6) estado[CuboID] = 16;  //verde + magenta = ardosia
+  else if(face[CuboID_outro1] == 4 && face[CuboID_outro2] == 5 || face[CuboID_outro2] == 4 && face[CuboID_outro1] == 5) estado[CuboID] = 15;  //verde + laranja = citrino
+  else if(face[CuboID_outro1] == 4 && face[CuboID_outro2] == 6 || face[CuboID_outro2] == 4 && face[CuboID_outro1] == 6) estado[CuboID] = 16;  //verde + magenta = ardosia
   
-  else if(face[1] == 5 && face[2] == 6 || face[2] == 5 && face[1] == 6) estado[CuboID] = 4; //laranja + magenta = considerei vermelho
+  else if(face[CuboID_outro1] == 5 && face[CuboID_outro2] == 6 || face[CuboID_outro2] == 5 && face[CuboID_outro1] == 6) estado[CuboID] = 4; //laranja + magenta = considerei vermelho
 
 
   
@@ -385,3 +390,4 @@ case 16://ardosia
   luzligada();
   estado[CuboID] = 1;
   break;
+
