@@ -296,7 +296,6 @@ case 8:
     else if(face[CuboID_outro1] == 6) estado[CuboID] = 7;
   }
 
-  */
 /*
  * azul + amarelo = verde
  * azul + vermelho = magenta
